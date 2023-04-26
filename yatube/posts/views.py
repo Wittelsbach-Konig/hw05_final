@@ -153,9 +153,8 @@ def profile_follow(request, username):
     """Подписаться"""
     user = request.user
     author = User.objects.get(username=username)
-    is_follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not is_follower.exists():
-        Follow.objects.create(user=user, author=author)
+    if user != author:
+        Follow.objects.get_or_create(user=user, author=author)
     return redirect('posts:profile', username=author)
 
 

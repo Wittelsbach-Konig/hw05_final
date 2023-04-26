@@ -5,11 +5,9 @@
   <div class="container py-5">
     {% include 'posts/includes/switcher.html' %}
     <h1> Лента подписки </h1>
-    {% cache 20 index_follow_page with page %}
     {% for post in page %}
       {% include "includes/post_card.html" %}
     {% endfor %}
-    {% endcache %}
     {% include 'posts/includes/paginator.html' %}
   </div>
 {% endblock %}

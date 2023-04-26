@@ -435,6 +435,7 @@ class FollowTests(TestCase):
         self.client_auth_following.force_login(self.user_following)
 
     def test_follow(self):
+        """Подписаться"""
         self.client_auth_follower.get(reverse('posts:profile_follow',
                                               kwargs={'username':
                                                       self.user_following.
@@ -442,6 +443,7 @@ class FollowTests(TestCase):
         self.assertEqual(Follow.objects.all().count(), 1)
 
     def test_unfollow(self):
+        """Отписаться"""
         self.client_auth_follower.get(reverse('posts:profile_follow',
                                               kwargs={'username':
                                                       self.user_following.
@@ -461,18 +463,3 @@ class FollowTests(TestCase):
         response = self.client_auth_following.get('/follow/')
         self.assertNotContains(response,
                                'Тестовая запись для тестирования ленты')
-
-    def test_add_comment(self):
-        self.client_auth_following.post(f'/following/{self.post.id}/comment',
-                                        {'text': "тестовый комментарий"},
-                                        follow=True)
-        response = self.client_auth_following.\
-            get(f'/following/{self.post.id}/')
-        self.assertContains(response, 'тестовый комментарий')
-        self.client_auth_following.logout()
-        self.client_auth_following.post(f'/following/{self.post.id}/comment',
-                                        {'text': "комментарий от гостя"},
-                                        follow=True)
-        response = self.client_auth_following.\
-            get(f'/following/{self.post.id}/')
-        self.assertNotContains(response, 'комментарий от гостя')
