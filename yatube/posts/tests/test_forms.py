@@ -20,6 +20,15 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 class PostCreateFormTests(TestCase):
     """Класс для тестирования Forms приложения Post"""
 
+    SMALL_GIF = (
+        b'\x47\x49\x46\x38\x39\x61\x02\x00'
+        b'\x01\x00\x80\x00\x00\x00\x00\x00'
+        b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+        b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+        b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+        b'\x0A\x00\x3B'
+    )
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -114,14 +123,7 @@ class PostCreateFormTests(TestCase):
         Проверяем что будет создана запись в базе данных
         при отправки формы создания поста с картинкой
         """
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
+        small_gif = self.SMALL_GIF
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -185,14 +187,7 @@ class PostCreateFormTests(TestCase):
         Проверяем что со страницы редактирования поста
         происходят изменения в базе данных
         """
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
+        small_gif = self.SMALL_GIF
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -238,14 +233,7 @@ class PostCreateFormTests(TestCase):
         При POST запросе неавторизованного
         пользователя пост не будет отредактирован
         """
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
+        small_gif = self.SMALL_GIF
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -300,14 +288,7 @@ class PostCreateFormTests(TestCase):
 
     def test_edit_post_authorized(self):
         """При POST запросе не автора пост не будет отредактирован"""
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
+        small_gif = self.SMALL_GIF
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,

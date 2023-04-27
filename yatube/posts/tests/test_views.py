@@ -144,6 +144,9 @@ class PostViewTest(TestCase):
             """Вспомогательная функция"""
             response = client.get(reverse(**rel_path))
             first_object = response.context['post']
+            form_fields = {
+                'text': forms.fields.CharField,
+            }
             context_names = {
                 first_object.text: PostViewTest.post.text,
                 first_object.author: PostViewTest.post.author,
@@ -156,6 +159,14 @@ class PostViewTest(TestCase):
                         expected,
                         context_name,
                         f'Неправильное название {context_name}'
+                    )
+            for value, expected in form_fields.items():
+                with self.subTest(value=value):
+                    form_field = response.context['form'].fields[value]
+                    self.assertIsInstance(
+                        form_field,
+                        expected,
+                        f'Поле формы {form_field} не совпадает с {expected}'
                     )
 
         rel_path = {
@@ -207,12 +218,14 @@ class PostViewTest(TestCase):
             response = client.get(reverse(**rel_path))
             first_object = response.context['page_obj'][0]
             second_object = response.context['author']
+            third_object = response.context['following']
             context_names = {
                 first_object.text: PostViewTest.post.text,
                 first_object.author: PostViewTest.post.author,
                 first_object.group: PostViewTest.post.group,
                 first_object.image: f'{PostViewTest.post.image.name}',
                 second_object: PostViewTest.author,
+                third_object: False,
             }
             for context_name, expected in context_names.items():
                 with self.subTest(context_name=context_name):
@@ -418,7 +431,12 @@ class CacheTests(TestCase):
 
 
 class FollowTests(TestCase):
+    """Класс для тестирования функционала подписок"""
+
     def setUp(self):
+        """
+        Создаём клиентов: избранного автора и его подписчика, и пост автора
+        """
         self.client_auth_follower = Client()
         self.client_auth_following = Client()
         self.user_follower = User.objects.create_user(username='follower',
@@ -436,14 +454,19 @@ class FollowTests(TestCase):
 
     def test_follow(self):
         """Подписаться"""
+        follow_count = Follow.objects.count()
         self.client_auth_follower.get(reverse('posts:profile_follow',
                                               kwargs={'username':
                                                       self.user_following.
                                                       username}))
-        self.assertEqual(Follow.objects.all().count(), 1)
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
+        follow = Follow.objects.latest()
+        self.assertEqual(follow.author, self.user_following)
+        self.assertEqual(follow.user, self.user_follower)
 
     def test_unfollow(self):
         """Отписаться"""
+        follow_count = Follow.objects.count()
         self.client_auth_follower.get(reverse('posts:profile_follow',
                                               kwargs={'username':
                                                       self.user_following.
@@ -451,15 +474,15 @@ class FollowTests(TestCase):
         self.client_auth_follower.get(reverse('posts:profile_unfollow',
                                       kwargs={'username':
                                               self.user_following.username}))
-        self.assertEqual(Follow.objects.all().count(), 0)
+        self.assertEqual(Follow.objects.count(), follow_count)
 
     def test_subscription_feed(self):
         """запись появляется в ленте подписчиков"""
         Follow.objects.create(user=self.user_follower,
                               author=self.user_following)
         response = self.client_auth_follower.get('/follow/')
-        post_text_0 = response.context["page_obj"][0].text
-        self.assertEqual(post_text_0, 'Тестовая запись для тестирования ленты')
+        post_0 = response.context["page_obj"][0]
+        self.assertEqual(post_0, self.post)
         response = self.client_auth_following.get('/follow/')
         self.assertNotContains(response,
-                               'Тестовая запись для тестирования ленты')
+                               self.post)
