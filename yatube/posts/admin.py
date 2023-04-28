@@ -1,13 +1,15 @@
 from django.contrib import admin
 
-from .models import Group, Post
+from .models import Comment, Follow, Group, Post
 
 MAX_MESS_SIZE = 30  # Максимальный размер выводимого текста, при создании поста
 
 
 class PostAdmin(admin.ModelAdmin):
-    """Класс пост-админ
-    Интерфейс администратора для списка постов"""
+    """
+    Класс пост-админ
+    Интерфейс администратора для списка постов.
+    """
 
     list_display = ('pk',
                     'text',
@@ -24,8 +26,10 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class GroupAdmin(admin.ModelAdmin):
-    """Класс групп-админ
-    Интерфейс администратора для списка групп"""
+    """
+    Класс групп-админ
+    Интерфейс администратора для списка групп.
+    """
 
     list_display = ('pk',
                     'title',
@@ -35,5 +39,34 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ('title',)
 
 
+class FollowAdmin(admin.ModelAdmin):
+    """
+    Класс подписка-админ
+    Интерфейс администратора для списка подписок.
+    """
+
+    list_display = ('pk',
+                    'user',
+                    'author',)
+    search_fields = ('user',)
+    list_filter = ('user',)
+
+
+class CommentAdmin(admin.ModelAdmin):
+    """
+    Класс подписка-админ
+    Интерфейс администратора для списка подписок.
+    """
+
+    list_display = ('pk',
+                    'post',
+                    'author',
+                    'text',)
+    search_fields = ('text',)
+    list_filter = ('text',)
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Group, GroupAdmin)
+admin.site.register(Follow, FollowAdmin)
+admin.site.register(Comment, CommentAdmin)

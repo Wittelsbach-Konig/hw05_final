@@ -53,6 +53,7 @@ class PostUrlTests(TestCase):
         }
         templates_url_names_user = {
             '/create/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html',
         }
         templates_url_names_author = {
             f'/posts/{PostUrlTests.post.pk}/edit/': 'posts/create_post.html',
@@ -71,6 +72,7 @@ class PostUrlTests(TestCase):
         """без авторизации приватные URL недоступны"""
         url_names = (
             '/create/',
+            '/follow/',
         )
         for adress in url_names:
             with self.subTest():

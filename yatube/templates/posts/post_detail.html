@@ -11,20 +11,20 @@
     <aside class="col-12 col-md-3">
       <ul class="list-group list-group-flush">
         <li class="list-group-item">
-              Дата публикации: {{ post.pub_date }} 
+          Дата публикации: {{ post.pub_date }} 
         </li>
         {% if post.group %}
-          <li class="list-group-item">
-              Группа: {{ post.group }}
-              <a href="{% url 'posts:group_list' post.group.slug %}">
-              все записи группы
-              </a>
-          </li>
+        <li class="list-group-item">
+          Группа: {{ post.group }}
+          <a href="{% url 'posts:group_list' post.group.slug %}">
+          все записи группы
+          </a>
+        </li>
         {% endif %}
         <li class="list-group-item">
           Автор: {{ post.author.get_full_name }}
           <a href="{% url 'posts:profile' post.author %}">
-              все посты пользователя
+            все посты пользователя
           </a>
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-center">

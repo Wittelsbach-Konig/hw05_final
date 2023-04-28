@@ -61,7 +61,6 @@ class Post(CreatedModel):
         'Картинка',
         upload_to='posts/',
         blank=True,
-        null=True,
     )
 
     class Meta:
@@ -119,4 +118,20 @@ class Follow(models.Model):
                                related_name="following")
 
     class Meta:
-        get_latest_by = ['author']
+        verbose_name = 'Подписку'
+        verbose_name_plural = 'Подписки'
+        get_latest_by = ('author')
+        constraints = (
+            models.UniqueConstraint(
+                name='unique_relationships',
+                fields=('user', 'author'),
+            ),
+            models.CheckConstraint(
+                name='prevent_self_follow',
+                check=~models.Q(user=models.F("author")),
+            ),
+        )
+
+    def __str__(self) -> str:
+        return (f'{self.user[:MAX_LEN_TO_STR]} '
+                f'подписан на {self.author[:MAX_LEN_TO_STR]}')

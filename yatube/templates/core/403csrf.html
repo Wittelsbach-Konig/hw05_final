@@ -1,10 +1,13 @@
 {% extends "base.html" %}
+{% block title %}Custom CSRF check error{% endblock %}
 {% block content %}
 <div class="container py-5">
   <div class="row">
     <div class="col-md-12">
       <div class="d-flex justify-content-center">
-        <h1>Custom CSRF check error. 403</h1>
+        <h1>Ошибка проверки CSRF. 403</h1>
+        <p>Ваш запрос был отклонён по причине истечения действия CSRF токена.</p>
+        <p>Перезагрузите страницу и попробуйте снова.</p>
       </div>
     </div>
   </div>

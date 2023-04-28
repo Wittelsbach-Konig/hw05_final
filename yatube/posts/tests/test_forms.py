@@ -1,16 +1,15 @@
 import shutil
 import tempfile
-
 from http import HTTPStatus
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, Comment
+from posts.models import Comment, Group, Post
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -233,19 +232,12 @@ class PostCreateFormTests(TestCase):
         При POST запросе неавторизованного
         пользователя пост не будет отредактирован
         """
-        small_gif = self.SMALL_GIF
-        uploaded = SimpleUploadedFile(
-            name='small.gif',
-            content=small_gif,
-            content_type='image/gif'
-        )
         post = Post.objects.create(
             author=User.objects.create_user(username='test_name',
                                             email='test@yandex.ru',
                                             password='test_pass',),
             text='Тестовая запись для тестового поста.',
             group=PostCreateFormTests.group,
-            image=uploaded
         )
         form_data = {
             'text': 'Измененный текст',
@@ -288,19 +280,12 @@ class PostCreateFormTests(TestCase):
 
     def test_edit_post_authorized(self):
         """При POST запросе не автора пост не будет отредактирован"""
-        small_gif = self.SMALL_GIF
-        uploaded = SimpleUploadedFile(
-            name='small.gif',
-            content=small_gif,
-            content_type='image/gif'
-        )
         post = Post.objects.create(
             author=User.objects.create_user(username='test_name',
                                             email='test@yandex.ru',
                                             password='test_pass',),
             text='Тестовая запись для тестового поста.',
             group=PostCreateFormTests.group,
-            image=uploaded
         )
         form_data = {
             'text': 'Измененный текст',
@@ -375,8 +360,13 @@ class PostCreateFormTests(TestCase):
             )
         )
         self.assertEqual(Comment.objects.count(), comments)
+        filter_params = {
+            'text': form_data["text"],
+            'author': self.user,
+            'post': post,
+        }
         self.assertFalse(
-            Comment.objects.filter(text=form_data["text"]).exists()
+            Comment.objects.filter(**filter_params).exists()
         )
 
     def test_add_comment_authorized(self):
@@ -413,6 +403,11 @@ class PostCreateFormTests(TestCase):
             reverse(**redirect_post)
         )
         self.assertEqual(Comment.objects.count(), comments + 1)
+        filter_params = {
+            'text': form_data["text"],
+            'author': self.user,
+            'post': post,
+        }
         self.assertTrue(
-            Comment.objects.filter(text=form_data["text"]).exists()
+            Comment.objects.filter(**filter_params).exists()
         )

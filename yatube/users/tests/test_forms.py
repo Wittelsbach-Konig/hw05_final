@@ -21,8 +21,8 @@ class UserCreateFormTests(TestCase):
             'last_name': 'Беглов',
             'username': 'Best_Gubernator',
             'email': 'beglov@yandex.ru',
-            'password1': 'test_pass',
-            'password2': 'test_pass',
+            'password1': 'test_pass123',
+            'password2': 'test_pass123',
         }
         response = self.client.post(
             reverse('users:signup'),
@@ -34,8 +34,12 @@ class UserCreateFormTests(TestCase):
             reverse('posts:index')
         )
         self.assertEqual(User.objects.count(), counts_users + 1)
+        filter_param = {
+            'username': form_data['username'],
+            'first_name': form_data['first_name'],
+            'last_name': form_data['last_name'],
+            'email': form_data['email'],
+        }
         self.assertTrue(
-            User.objects.filter(
-                username=form_data['username'],
-            ).exists()
+            User.objects.filter(**filter_param).exists()
         )
